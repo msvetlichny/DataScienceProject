@@ -1,15 +1,10 @@
-# Data Science FP2 - Informatics Client Final Project Implementation and Presentation
+# Data Science FP2 - Data Science Final Project Implementation and Presentation for Clients
 Class: CS251 – Data Science   
 Last Modified: 5/11/2021
 Authors: Kent Jones
 
 ## Overview
 The final project will be presented to the entire class and you may also wish to present your research at other venues (conferences, etc.) in the future, so, doing a good job on this research project can benefit you and your clients! Be sure to invite your client to the presentation! We will record the presentations as well so they can see it if they can't attend.
-
-This project will have two parts:
-1. Understanding the implementation
-2. Understanding the presentation
-
 
 **************************************
 ### Grade Break Down
@@ -23,14 +18,17 @@ This project will have two parts:
 ### 100 pts - Final Analysis and Presentation
 ***************************************************************
 
+
 * (10 points)  Title and Overview – A concise overview of your analysis in proper abstract form
     - Title
     - Group Members and Tasks
-  
+
+
 * (10 points) Introduction
     - Define your analysis topic in a focused, articulate manner
     - Introduces problems or challenges and why this is interesting
     - Set up a background understanding 
+
 
 * (50 pts) Body of the Analysis
     - Discuss the different analysis approaches tried in the analysis and any problems or issues 
@@ -38,17 +36,20 @@ This project will have two parts:
     - Present analysis findings in the form of graphs and visualizations
     - Identify future research if appropriate
 
+
 * (10 points) Conclusions
     - Summarizes important concepts of your analysis 
     - Report your conclusions drawing on the research you have conducted 
     - Demonstrate critical thinking in analysis of outcomes (positive or negative it does not matter) e.g. good analysis of test vs training data and evaluation of model results. How good is the model? Do your models extrapolate/generalize well to new data?
     - Did your model overtrain? Undertrain?
 
+
 * (10 points) Organization Clarity and PowerPoint Presentation
     - Explain the analysis in R or Python
     - Neat and clear organization 
     - Consistent with this outline
     - Clarity of presentation and conclusions
+
 
 * (10 points) References
     - Appropriate use of meaningful references
