@@ -15,10 +15,6 @@ import dedupe
 
 
 # Filters the original dataset
-# - (1) Exludes rows with missing name data
-# - (2) Exludes rows not in washington
-# - (3) Exludes rows not in select cities
-# - (3) Exludes rows where 'code' is not 'Induvidual'
 def initialFilter(input_path):
     data = pd.read_csv(input_path + ".csv")
     print("Original:")
@@ -29,60 +25,84 @@ def initialFilter(input_path):
     print("1")
     print(data.shape)
 
-    # data = data[(data['contributor_state'] == "WA")]
-    # print("3")
-    # print(data.shape)
-
     # - (2) Exludes rows where 'code' is not 'Induvidual'
     data = data[(data['code'] == "Individual")]
     print("2")
     print(data.shape)
 
-    # - (3) Filter out all cities not
+    # - (3) filters out any state thats not empty or WA
+    data2 = data[data["contributor_state"].isna()]
+    data = data[data["contributor_state"] == "WA"]
+    frames = [data, data2]
+    data = pd.concat(frames)
+    print("3")
+    print(data.shape)
+    print("Amount of NA variables")
+    print(data2.shape)
+
+    # - (4) filters out entries without atleast address or city info
+    data = data[data["contributor_address"].notna() | data["contributor_city"].notna() | data["contributor_zip"].notna()]
+    print("4")
+    print(data.shape)
+
+    # - (5) Filter out all cities that are in target counties
     filtered_cities = pd.read_csv("../Data/Cities_filtered.csv")
     filtered_cities_list = filtered_cities["City Name"].tolist()
-    print(filtered_cities_list)
     boolean_series = data.contributor_city.isin(filtered_cities_list)
     data2 = data[data["contributor_city"].isna()]
     data = data[boolean_series] 
     frames = [data, data2]
     data = pd.concat(frames)
-    print("(3) Filtered by cities in targeted counties")
+    print("5")
     print(data.shape)
     print("Amount of NA variables")
     print(data2.shape)
 
-    # - (4) Exludes rows not in washington (keeps empty cells with addresses )
-    listToDrop = []
-    for index, row in data.iterrows():
+    # Remnants of a dark past, RIP (just an example)
+    # - (6) Exludes rows not in washington (keeps empty cells with addresses )
+    # listToDrop = []
+    # for index, row in data.iterrows():
+    #     if [CONDITION]:
+    #         listToDrop.append(index)
+    #     if (index % 10000 == 0 and not index == 0):
+    #         print(index) 
+    #     index += 1
 
-        haveAddress = row['contributor_state'] == None and (row['contributor_address'] or row['contributor_city'])
-        inWashington = row['contributor_state'] == "WA"
-
-        if(not haveAddress and not inWashington):
-            listToDrop.append(index)
-
-        if (index % 10000 == 0 and not index == 0):
-            print(index) 
-        
-        index += 1
-
-    print("Got list to drop: length - " + str(len(listToDrop)))
-    # print("Making Indexes...")
-    # rowsToDrop = data.index[listToDrop]
-    print("Dropping rows...")
-    data.drop(listToDrop, inplace=True)
-    print("Done dropping rows...")
-    print("4")
-    print(data.shape)
+    # print("Got list to drop: length - " + str(len(listToDrop)))
+    # print("Dropping rows...")
+    # data.drop(listToDrop, inplace=True)
+    # print("Done dropping rows...")
+    # print("6")
+    # print(data.shape)
 
     # Finishes by writing a new csv
     return data
 
+# Gets all entries from two subsets of political data datasets and removes duplicate entries by combining the id and origin columns
+def mergeDataSets(in_path_1, in_path_2):
+
+    data1 = pd.read_csv(in_path_1 + ".csv")
+    data2 = pd.read_csv(in_path_2 + ".csv")
+    data1["unique_id"] = data1["id"].astype(str) + data1["origin"]
+    data2["unique_id"] = data2["id"].astype(str) + data2["origin"]
+    dataMerged=pd.concat([data1,data2]).drop_duplicates(subset="unique_id")
+    data1Merged=data1.drop_duplicates(subset="unique_id")
+    data2Merged=data2.drop_duplicates(subset="unique_id")
+
+    print("Original Sizes:")
+    print(data1.shape)
+    print(data2.shape)
+    print("Intraset Duplicates Removed:")
+    print(data1Merged.shape)
+    print(data2Merged.shape)
+    print("Combined Set Duplicates Removed:")
+    print(dataMerged.shape)
+    return dataMerged
+
 # Read in the data that dedupe accepts 
 def readData(input_path):
     data_d = {}
-    with open(input_path+".csv") as f:
+    with open(input_path+".csv", encoding="utf8") as f:
         reader = csv.DictReader(f)
         for row in reader:
             row_id = int(row['id'])
@@ -165,17 +185,26 @@ def groupByCluster(data):
 # Main entry point for the program
 def main():
 
-    #curDataPath = "../Data/political_donations_data"
+    # Base name for data set (don't change)
     curDataPath = "../Data/political_donations_data"
 
-    curData = initialFilter(curDataPath)
-    curDataPath = curDataPath+"_filtered"
-    curData.to_csv(path_or_buf=curDataPath+".csv")
+    # #STEP 1: Filter the data (then comment out)
+    # curData = initialFilter(curDataPath)
+    # curDataPath = curDataPath+"_filtered"
+    # curData.to_csv(path_or_buf=curDataPath+".csv")
 
-    exit()
+    #STEP 2: Merge data with any other data sets (id and origin fields together make rows unique) (then comment out)
+    # curDataPath1 = "../Data/political_donations_data_filtered_python"
+    # curDataPath2 = "../Data/political_donations_data_filtered_r"
+    # curData = mergeDataSets(curDataPath1, curDataPath2)
+    # curDataPath =  curDataPath+"_merged"
+    # curData.to_csv(path_or_buf=curDataPath+".csv")
 
+    #STEP 3: Create dupelicate cluster (then comment out)
+    curDataPath = curDataPath+"_merged"
     curDataPath = createDupeClusters(curDataPath)
 
+    # #STEP 4: Aggregate the clusters
     #curData = groupByCluster(curDataPath)
     #curData.to_csv(path_or_buf=curDataPath+"_aggregated.csv")
 
