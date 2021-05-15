@@ -1,6 +1,6 @@
 """
 program: dedupe_political_donations.py
-author: Kostiantyn Makrasnov
+author: Kostiantyn Makrasnov, Michael Svetlichny, Spencer G
 date: 05/13/2021
 purpose: find clusters of similar rows in the political donations dataset, then
 combine all of the rows
@@ -17,20 +17,63 @@ import dedupe
 # Filters the original dataset
 # - (1) Exludes rows with missing name data
 # - (2) Exludes rows not in washington
+# - (3) Exludes rows not in select cities
 # - (3) Exludes rows where 'code' is not 'Induvidual'
 def initialFilter(input_path):
     data = pd.read_csv(input_path + ".csv")
+    print("Original:")
+    print(data.shape)
 
     # - (1) Exludes rows with missing name data
     data.dropna(inplace=True, subset=["contributor_name"])
+    print("1")
+    print(data.shape)
 
-    # - (2) Exludes rows not in washington
-    data = data[(data['contributor_state'] == "WA")]
+    # data = data[(data['contributor_state'] == "WA")]
+    # print("3")
+    # print(data.shape)
 
-    # - (3) Exludes rows where 'code' is not 'Induvidual'
+    # - (2) Exludes rows where 'code' is not 'Induvidual'
     data = data[(data['code'] == "Individual")]
+    print("2")
+    print(data.shape)
 
-    print("data.shape()")
+    # - (3) Filter out all cities not
+    filtered_cities = pd.read_csv("../Data/Cities_filtered.csv")
+    filtered_cities_list = filtered_cities["City Name"].tolist()
+    print(filtered_cities_list)
+    boolean_series = data.contributor_city.isin(filtered_cities_list)
+    data2 = data[data["contributor_city"].isna()]
+    data = data[boolean_series] 
+    frames = [data, data2]
+    data = pd.concat(frames)
+    print("(3) Filtered by cities in targeted counties")
+    print(data.shape)
+    print("Amount of NA variables")
+    print(data2.shape)
+
+    # - (4) Exludes rows not in washington (keeps empty cells with addresses )
+    listToDrop = []
+    for index, row in data.iterrows():
+
+        haveAddress = row['contributor_state'] == None and (row['contributor_address'] or row['contributor_city'])
+        inWashington = row['contributor_state'] == "WA"
+
+        if(not haveAddress and not inWashington):
+            listToDrop.append(index)
+
+        if (index % 10000 == 0 and not index == 0):
+            print(index) 
+        
+        index += 1
+
+    print("Got list to drop: length - " + str(len(listToDrop)))
+    # print("Making Indexes...")
+    # rowsToDrop = data.index[listToDrop]
+    print("Dropping rows...")
+    data.drop(listToDrop, inplace=True)
+    print("Done dropping rows...")
+    print("4")
     print(data.shape)
 
     # Finishes by writing a new csv
@@ -123,11 +166,13 @@ def groupByCluster(data):
 def main():
 
     #curDataPath = "../Data/political_donations_data"
-    curDataPath = "../Data/political_donations_data_small"
+    curDataPath = "../Data/political_donations_data"
 
     curData = initialFilter(curDataPath)
     curDataPath = curDataPath+"_filtered"
     curData.to_csv(path_or_buf=curDataPath+".csv")
+
+    exit()
 
     curDataPath = createDupeClusters(curDataPath)
 
