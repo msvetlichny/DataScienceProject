@@ -68,6 +68,21 @@ The purpose of project presentation is to evaluate the effectiveness of the fina
 ### What to Turn In
 ***************************************************************
 * All analysis scripts pushed to this group folder.
+```
+See the "Scripts" folder
+```
+
 * Readme.md with instructions on how to get the data OR who to request data from.
+```
+See the "Documents" folder word files
+```
+
 * You could include the data if its not huge (over a 8 megabytes)
+```
+Our data sets were 300mb - 4gb in size
+```
+
 * The presentation PDFs or PowerPoint
+```
+See the "Documents/Innovia Presentation.pdf" file
+```

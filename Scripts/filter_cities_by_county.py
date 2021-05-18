@@ -1,6 +1,6 @@
 countyList = ["Ferry", "Stevens", "Pend", "Oreille", "Lincoln","Spokane", "Adams", "Whitman", "Columbia", "Garfield", "Asotin"]
 
-curDataPath = "../Data/Cities"
+curDataPath = "../Data/cities_filtered_by_eastern_washinton_county"
 
 import pandas as pd
 data = pd.read_csv(curDataPath+".csv")

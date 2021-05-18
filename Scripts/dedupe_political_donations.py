@@ -201,7 +201,7 @@ def main():
     # curData.to_csv(path_or_buf=curDataPath+".csv")
 
     #STEP 3: Create dupelicate cluster (then comment out)
-    curDataPath = curDataPath+"_merged"
+    curDataPath = curDataPath+"_sorted_upto20k"
     curDataPath = createDupeClusters(curDataPath)
 
     # #STEP 4: Aggregate the clusters
